@@ -47,14 +47,16 @@
                 <div class="h-px bg-white/10 flex-1"></div>
             </div>
 
-            <form action="#" class="space-y-5">
+           <form method="POST" action="{% url 'account:login' %}" class="space-y-4">
+            
+            {% csrf_token %}
                 <div>
                     <label class="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
-                    <input type="email" placeholder="you@example.com" class="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                    <input type="email" name="email" placeholder="you@example.com" class="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-400 mb-2">Password</label>
-                    <input type="password" placeholder="••••••••" class="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                    <input type="password" name="password" placeholder="••••••••" class="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
                 </div>
 
                 <div class="flex items-center justify-between text-sm">
