@@ -46,7 +46,17 @@
                 <span class="text-gray-500 text-sm">OR</span>
                 <div class="h-px bg-white/10 flex-1"></div>
             </div>
-
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="p-3 rounded mb-2 text-sm
+                        {% if message.tags == 'error' %} bg-red-500/10 text-red-400 border border-red-500/20
+                        {% else %} bg-green-500/10 text-green-400 border border-green-500/20 {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
            <form method="POST" action="{% url 'account:login' %}" class="space-y-4">
             
             {% csrf_token %}

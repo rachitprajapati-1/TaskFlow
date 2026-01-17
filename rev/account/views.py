@@ -10,7 +10,7 @@ def login(request):
         user = authenticate(request, username=email, password=password)
         if user is not None:
             auth_login(request, user)
-            return redirect('home')
+            return redirect('myapp:todo')
         else:
             messages.error(request, "Invalid email or password.")
 
