@@ -27,3 +27,22 @@ def delete_task(request,id):
     task=get_object_or_404(Todo,id=id,user=request.user)
     task.delete()
     return redirect('myapp:todo')
+
+def update_task(request,id):
+    task=get_object_or_404(Todo,id=id,user=request.user)
+    if request.method=="POST":
+        new_title=request.POST.get('title')
+        task.title=new_title
+        task.save()
+        return redirect('myapp:todo')
+    return render(request,'edit.html',{'task':task})
+
+def update_status(request,id):
+    task=get_object_or_404(Todo,id=id,user=request.user)
+    if task.completed==True:
+        task.completed=False
+        task.save()
+    else:
+        task.completed=True
+        task.save()
+    return redirect('myapp:todo')
