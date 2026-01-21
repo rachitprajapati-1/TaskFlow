@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Live Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style> body { font-family: sans-serif; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-800 border-r border-slate-700 flex flex-col hidden md:flex opacity-60">
+        <div class="h-16 flex items-center px-8 border-b border-slate-700">
+             <span class="text-xl font-bold tracking-tight">TaskFlow Demo</span>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2 pointer-events-none">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl">
+                <span class="font-medium">Todo List</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400">
+                <span class="font-medium">Notes (Locked)</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        
+        <div class="bg-indigo-600 text-white text-sm py-2 px-4 text-center font-bold flex justify-between items-center">
+            <span>👀 You are in Demo Mode. Data will not be saved.</span>
+            <a href="{% url 'account:signup' %}" class="bg-white text-indigo-600 px-3 py-1 rounded hover:bg-slate-100 transition">Create Real Account</a>
+        </div>
+
+        <header class="h-16 bg-slate-800/50 backdrop-blur-md border-b border-slate-700 flex items-center justify-between px-6">
+            <h1 class="text-lg font-semibold text-white">Guest Dashboard</h1>
+            <a href="{% url 'myapp:home' %}" class="text-sm text-slate-400 hover:text-white">Exit Demo</a>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 md:p-10">
+            <div class="max-w-6xl mx-auto">
+                
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">My Tasks</h2>
+                    <p class="text-slate-400">Try adding a task to see how it works!</p>
+                </div>
+
+                <div class="bg-slate-800 rounded-xl p-4 mb-8 border border-slate-700 shadow-lg">
+                    <form onsubmit="addTask(event)" class="flex gap-4">
+                        <input type="text" id="taskInput" placeholder="What needs to be done?" required
+                               class="flex-1 bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                            Add
+                        </button>
+                    </form>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-blue-500"></span> To Do
+                        </h3>
+                        <div id="incompleteList" class="space-y-3">
+                            </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-green-500"></span> Completed
+                        </h3>
+                        <div id="completeList" class="space-y-3">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. Initial Dummy Data
+        let tasks = [
+            { id: 1, title: "Explore TaskFlow Demo", completed: false, date: "Just now" },
+            { id: 2, title: "Sign up for an account", completed: true, date: "Just now" }
+        ];
+
+        // 2. Function to Render the HTML
+        function renderTasks() {
+            const incompleteContainer = document.getElementById('incompleteList');
+            const completeContainer = document.getElementById('completeList');
+            
+            incompleteContainer.innerHTML = '';
+            completeContainer.innerHTML = '';
+
+            tasks.forEach(task => {
+                // Create HTML for a single task
+                const html = `
+                <div class="flex items-center justify-between bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleTask(${task.id})" class="w-6 h-6 rounded-full border-2 ${task.completed ? 'bg-blue-500 border-blue-500' : 'border-slate-600 hover:border-blue-500'} flex items-center justify-center">
+                            ${task.completed ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                        </button>
+                        <div>
+                            <h3 class="font-medium ${task.completed ? 'text-slate-500 line-through' : 'text-slate-200'}">${task.title}</h3>
+                            <p class="text-xs text-slate-500">${task.date}</p>
+                        </div>
+                    </div>
+                    <button onclick="deleteTask(${task.id})" class="text-slate-500 hover:text-red-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>`;
+
+                // Inject into correct column
+                if (task.completed) {
+                    completeContainer.innerHTML += html;
+                } else {
+                    incompleteContainer.innerHTML += html;
+                }
+            });
+        }
+
+        // 3. Add Task
+        function addTask(event) {
+            event.preventDefault(); // Stop form from reloading page
+            const input = document.getElementById('taskInput');
+            if (!input.value) return;
+
+            const newTask = {
+                id: Date.now(), // Random unique ID
+                title: input.value,
+                completed: false,
+                date: "Just now"
+            };
+
+            tasks.unshift(newTask); // Add to top of list
+            input.value = ''; // Clear input
+            renderTasks();
+        }
+
+        // 4. Toggle Status
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                renderTasks();
+            }
+        }
+
+        // 5. Delete Task
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            renderTasks();
+        }
+
+        // Run on load
+        renderTasks();
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}My Notes{% endblock %}
+{% block page_title %}Notes{% endblock %}
+
+{% block content %}
+    
+    <div class="mb-8 bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <form action="{% url 'notes:add' %}" method="POST" class="space-y-4">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Note Title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            
+            <textarea name="content" rows="3" placeholder="Write something..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            
+            <div class="flex justify-between items-center">
+                <div class="flex gap-2">
+                    <label class="cursor-pointer"><input type="radio" name="color" value="blue" checked class="hidden peer"><span class="w-6 h-6 rounded-full bg-blue-500/20 border-2 border-blue-500 block peer-checked:bg-blue-500"></span></label>
+                    <label class="cursor-pointer"><input type="radio" name="color" value="yellow" class="hidden peer"><span class="w-6 h-6 rounded-full bg-yellow-500/20 border-2 border-yellow-500 block peer-checked:bg-yellow-500"></span></label>
+                    <label class="cursor-pointer"><input type="radio" name="color" value="green" class="hidden peer"><span class="w-6 h-6 rounded-full bg-green-500/20 border-2 border-green-500 block peer-checked:bg-green-500"></span></label>
+                    <label class="cursor-pointer"><input type="radio" name="color" value="red" class="hidden peer"><span class="w-6 h-6 rounded-full bg-red-500/20 border-2 border-red-500 block peer-checked:bg-red-500"></span></label>
+                    <label class="cursor-pointer"><input type="radio" name="color" value="purple" class="hidden peer"><span class="w-6 h-6 rounded-full bg-purple-500/20 border-2 border-purple-500 block peer-checked:bg-purple-500"></span></label>
+                </div>
+                
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium">Save Note</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for note in notes %}
+        <div class="relative group p-6 rounded-xl border transition-all duration-300 hover:-translate-y-1 
+            {% if note.color == 'blue' %} bg-blue-900/20 border-blue-500/30 text-blue-100
+            {% elif note.color == 'yellow' %} bg-yellow-900/20 border-yellow-500/30 text-yellow-100
+            {% elif note.color == 'green' %} bg-emerald-900/20 border-emerald-500/30 text-emerald-100
+            {% elif note.color == 'red' %} bg-red-900/20 border-red-500/30 text-red-100
+            {% elif note.color == 'purple' %} bg-purple-900/20 border-purple-500/30 text-purple-100
+            {% endif %}">
+            
+            <h3 class="font-bold text-lg mb-2">{{ note.title }}</h3>
+            <p class="text-sm opacity-80 whitespace-pre-wrap">{{ note.content }}</p>
+            
+            <div class="mt-4 flex justify-between items-center text-xs opacity-50">
+                <span>{{ note.created_at|date:"M d" }}</span>
+                
+                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <a href="{% url 'notes:edit' note.id %}" class="hover:text-white" title="Edit">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        </a>
+
+        <a href="{% url 'notes:delete' note.id %}" class="hover:text-red-400" onclick="return confirm('Delete note?')">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        </a>
+    </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12 text-slate-500">
+            No notes yet. Create one above!
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
