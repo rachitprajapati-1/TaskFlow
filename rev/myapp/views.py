@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Todo
 from django.contrib.auth import logout
@@ -22,3 +22,8 @@ def add_task(request):
             title=title
         )
         return redirect('myapp:todo')
+    
+def delete_task(request,id):
+    task=get_object_or_404(Todo,id=id,user=request.user)
+    task.delete()
+    return redirect('myapp:todo')
